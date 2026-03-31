@@ -13,6 +13,16 @@ This project is intentionally lightweight (no web app) so it can run anywhere wi
 
 In day-to-day studying, it’s hard to remember **what** to revise and **when**. This tool uses a simple memory model + rule-based scheduling to generate a daily list of “due for revision” concepts and then reinforces learning with a quick quiz loop.
 
+## Research gap (motivation)
+
+Most existing study tools (such as flashcard apps or simple to-do lists) rely on **manual revision scheduling**. They typically do not predict *when* a learner is likely to forget information.
+
+Human memory naturally follows a forgetting pattern where recall decreases over time if knowledge is not reinforced. However, many students revise randomly rather than at the optimal time.
+
+While spaced repetition systems exist, they can involve complex interfaces and/or assumptions that are not transparent to the learner.
+
+This project addresses this gap by implementing a **lightweight intelligent revision assistant** that predicts memory retention and schedules revision automatically using a simple and explainable memory decay model.
+
 ## Key features
 
 - **Knowledge tracker**: log topic, concept, difficulty, and study date
@@ -84,6 +94,112 @@ These files are read/written locally in the same folder as `main.py`.
 - **Modeling**: exponential decay model for retention prediction
 - **Rule-based agent**: Observe → Predict → Decide → Act → Learn loop (implemented in CLI flow)
 - **Adaptation**: next review date changes based on quiz outcome
+
+## Memory prediction algorithm
+
+The project uses the **Exponential Forgetting Curve Model**:
+
+\[
+R(t) = e^{-kt}
+\]
+
+Where:
+
+- **\(R(t)\)**: retention probability (converted to a percentage in the CLI)
+- **\(t\)**: time since last review (in days)
+- **\(k\)**: forgetting rate (higher means faster forgetting)
+
+Difficulty levels adjust the forgetting rate \(k\):
+
+| Difficulty | Forgetting Rate (k) |
+|-----------|----------------------|
+| Easy | 0.20 |
+| Medium | 0.30 |
+| Hard | 0.45 |
+
+Hard concepts decay faster than easy ones, so they become “due for revision” earlier.
+
+## AI agent architecture (intelligent agent cycle)
+
+This system behaves like an **Intelligent Agent** using the cycle:
+
+**Observe → Predict → Decide → Act → Learn**
+
+| Stage | Implementation |
+|------|----------------|
+| Observe | Load study data from CSV |
+| Predict | Calculate retention using the forgetting curve |
+| Decide | If retention < 60%, schedule revision |
+| Act | Generate a quiz question |
+| Learn | Update revision schedule based on quiz result |
+
+## Architecture diagram
+
+```text
+User
+ ↓
+CLI Interface
+ ↓
+Data Storage (CSV)
+ ↓
+Memory Prediction Model
+ ↓
+Revision Scheduler
+ ↓
+Question Generator
+ ↓
+Quiz Evaluation
+ ↓
+Adaptive Scheduling
+```
+
+## Experimental results (example output)
+
+```text
+Today's Revision Tasks
+
+1. Machine Learning - Regression
+Predicted Retention: 52%
+
+Question:
+What is Regression?
+
+2. Machine Learning - Overfitting
+Predicted Retention: 48%
+
+Question:
+Explain the concept of Overfitting.
+
+Performance summary:
+
+Concepts Studied: 10
+Revisions Completed: 6
+Average Retention: 78%
+```
+
+## System evaluation
+
+The system was tested using several concepts from **Artificial Intelligence** and **Machine Learning** topics.
+
+The results show that the revision assistant correctly identifies when retention falls below the threshold and generates revision tasks accordingly.
+
+The adaptive quiz scheduling helps reinforce learning by adjusting revision intervals based on user performance.
+
+## Contribution
+
+This project demonstrates how a simple mathematical memory model combined with rule-based decision making can create an effective intelligent learning assistant without requiring complex machine learning infrastructure.
+
+The system shows that meaningful AI-based tools can be built using interpretable algorithms and lightweight architectures.
+
+## Future work
+
+Future improvements may include:
+
+- Personalized forgetting rates learned from user behaviour
+- Natural language answer evaluation using semantic similarity
+- Graphical user interface for easier interaction
+- Integration with learning platforms
+- Mobile app version for daily reminders
 
 ## Limitations (current scope)
 
